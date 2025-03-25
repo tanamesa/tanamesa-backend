@@ -14,9 +14,85 @@ datasource db {
 }
 
 model user {
-  id Int @default(autoincrement()) @id
-  name String
-  email String @unique
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  id         String    @id @default(uuid())
+  name       String
+  email      String    @unique
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now()) @updatedAt
+  user_type  user_type @default(CLIENT)
+
+  orders order[]
+
+  order_ticket order_ticket[]
+}
+
+enum user_type {
+  EMPLOYEE
+  CLIENT
+}
+
+model table {
+  id String @id @default(uuid())
+
+  order_ticket order_ticket[]
+}
+
+// --
+
+model order_ticket {
+  id         String              @id @default(uuid())
+  table_id   String
+  status     order_ticket_status @default(RUNNING)
+  employee_id String
+  created_at DateTime            @default(now())
+  updated_at DateTime            @updatedAt
+
+
+  table table @relation(fields: [table_id], references: [id])
+  employee user @relation(fields: [employee_id], references: [id])
+  order order[]
+}
+
+enum order_ticket_status {
+  RUNNING
+  CLOSED
+}
+
+model order {
+  id              String        @id @default(uuid())
+  order_ticket_id String
+  user_id         String
+  status          order_status  @default(RUNNING)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @default(now()) @updatedAt
+  itens           order_itens[]
+
+  user user @relation(fields: [user_id], references: [id])
+  order_ticket order_ticket @relation(fields: [order_ticket_id], references: [id])
+}
+
+model order_itens {
+  id         String @id @default(uuid())
+  order_id   String
+  quantity   Int
+  product_id String
+
+  order order @relation(fields: [order_id], references: [id])
+  product product @relation(fields: [product_id], references: [id])
+}
+
+enum order_status {
+  RUNNING
+  READY
+  DELIVERED
+}
+
+model product {
+  id          String  @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  enabled     Boolean @default(true)
+
+  order_itens order_itens[]
 }
