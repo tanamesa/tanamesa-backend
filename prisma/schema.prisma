@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,86 +7,94 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id         String    @id @default(uuid())
+model User {
+  id         Int      @default(autoincrement()) @id
   name       String
-  email      String    @unique
-  created_at DateTime  @default(now())
-  updated_at DateTime  @default(now()) @updatedAt
-  user_type  user_type @default(CLIENT)
+  email      String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  user_type  UserType @default(CLIENT)
 
-  orders order[]
+  orders       Order[]
+  orderTickets OrderTicket[]
 
-  order_ticket order_ticket[]
+  @@map("user")
 }
 
-enum user_type {
+enum UserType {
   EMPLOYEE
   CLIENT
 }
 
-model table {
-  id String @id @default(uuid())
+model Table {
+  id Int @default(autoincrement()) @id
 
-  order_ticket order_ticket[]
+  orderTickets OrderTicket[]
+
+  @@map("table")
 }
 
-// --
+model OrderTicket {
+  id          Int               @default(autoincrement()) @id
+  table_id    Int
+  status      OrderTicketStatus @default(RUNNING)
+  employee_id Int
+  created_at  DateTime          @default(now())
+  updated_at  DateTime          @updatedAt
 
-model order_ticket {
-  id         String              @id @default(uuid())
-  table_id   String
-  status     order_ticket_status @default(RUNNING)
-  employee_id String
-  created_at DateTime            @default(now())
-  updated_at DateTime            @updatedAt
+  table    Table   @relation(fields: [table_id], references: [id])
+  employee User    @relation(fields: [employee_id], references: [id])
+  orders   Order[]
 
-
-  table table @relation(fields: [table_id], references: [id])
-  employee user @relation(fields: [employee_id], references: [id])
-  order order[]
+  @@map("order_ticket")
 }
 
-enum order_ticket_status {
+enum OrderTicketStatus {
   RUNNING
   CLOSED
 }
 
-model order {
-  id              String        @id @default(uuid())
-  order_ticket_id String
-  user_id         String
-  status          order_status  @default(RUNNING)
-  created_at      DateTime      @default(now())
-  updated_at      DateTime      @default(now()) @updatedAt
-  itens           order_itens[]
+model Order {
+  id              Int         @default(autoincrement()) @id
+  order_ticket_id Int
+  user_id         Int
+  status          OrderStatus @default(RUNNING)
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @default(now()) @updatedAt
 
-  user user @relation(fields: [user_id], references: [id])
-  order_ticket order_ticket @relation(fields: [order_ticket_id], references: [id])
+  user        User        @relation(fields: [user_id], references: [id])
+  orderTicket OrderTicket @relation(fields: [order_ticket_id], references: [id])
+  items       OrderItem[]
+
+  @@map("order")
 }
 
-model order_itens {
-  id         String @id @default(uuid())
-  order_id   String
+model OrderItem {
+  id         Int @default(autoincrement()) @id
+  order_id   Int
   quantity   Int
-  product_id String
+  product_id Int
 
-  order order @relation(fields: [order_id], references: [id])
-  product product @relation(fields: [product_id], references: [id])
+  order   Order   @relation(fields: [order_id], references: [id])
+  product Product @relation(fields: [product_id], references: [id])
+
+  @@map("order_item")
 }
 
-enum order_status {
+enum OrderStatus {
   RUNNING
   READY
   DELIVERED
 }
 
-model product {
-  id          String  @id @default(uuid())
+model Product {
+  id          Int     @default(autoincrement()) @id
   name        String
   description String
   price       Float
   enabled     Boolean @default(true)
 
-  order_itens order_itens[]
+  orderItems OrderItem[]
+
+  @@map("product")
 }
