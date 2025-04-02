@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas = ["tanamesa"]
 }
 
 model User {
@@ -19,11 +21,13 @@ model User {
   orderTickets OrderTicket[]
 
   @@map("user")
+  @@schema("tanamesa")
 }
 
 enum UserType {
   EMPLOYEE
   CLIENT
+  @@schema("tanamesa")
 }
 
 model Table {
@@ -32,6 +36,7 @@ model Table {
   orderTickets OrderTicket[]
 
   @@map("table")
+  @@schema("tanamesa")
 }
 
 model OrderTicket {
@@ -47,11 +52,13 @@ model OrderTicket {
   orders   Order[]
 
   @@map("order_ticket")
+  @@schema("tanamesa")
 }
 
 enum OrderTicketStatus {
   RUNNING
   CLOSED
+  @@schema("tanamesa")
 }
 
 model Order {
@@ -67,6 +74,7 @@ model Order {
   items       OrderItem[]
 
   @@map("order")
+  @@schema("tanamesa")
 }
 
 model OrderItem {
@@ -79,12 +87,14 @@ model OrderItem {
   product Product @relation(fields: [product_id], references: [id])
 
   @@map("order_item")
+  @@schema("tanamesa")
 }
 
 enum OrderStatus {
   RUNNING
   READY
   DELIVERED
+  @@schema("tanamesa")
 }
 
 model Product {
@@ -97,4 +107,5 @@ model Product {
   orderItems OrderItem[]
 
   @@map("product")
+  @@schema("tanamesa")
 }
