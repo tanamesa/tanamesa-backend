@@ -15,6 +15,7 @@ model User {
   email      String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
+  deletedAt DateTime? // <- Soft delete
   user_type  UserType @default(CLIENT)
 
   orders       Order[]

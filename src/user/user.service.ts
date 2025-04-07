@@ -52,10 +52,13 @@ export class UserService {
         }
     }
 
-    //     async remove(id: number): Promise<UserEntity> {
-    //       const existingUser = await this.findOne(id);
-    //       return await this.userRepository.remove(
-    //         existingUser,
-    //       );
-    //     }
-}
+
+    async softDelete(id: number) {
+        return this.prismaService.user.update({
+          where: { id },
+          data: {
+            deletedAt: new Date()
+          }
+        })
+      }
+    }

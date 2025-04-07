@@ -40,4 +40,9 @@ export class UserController {
         );
 
     }
+    @Delete(':id')
+async softDelete(@Param('id') id: string) {
+  return await this.userService.softDelete(Number(id));
+}
+
 }  
