@@ -57,7 +57,7 @@ export class UserService {
         return this.prismaService.user.update({
           where: { id },
           data: {
-            deletedAt: new Date()
+            deleted_at: new Date()
           }
         })
       }
