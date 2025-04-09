@@ -6,7 +6,6 @@ import {
     Patch,
     Param,
     Delete,
-    UnprocessableEntityException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './create-user-dto';
@@ -18,6 +17,15 @@ export class UserController {
     constructor(
         private readonly userService: UserService,
     ) { }
+
+    @Get("email/:email")
+    async getUserByEmail(
+        @Param("email") email: string
+    ) {
+        return await this.userService.findByEmail(
+            email
+        );
+    }
 
     @Post()
     async create(
@@ -43,8 +51,7 @@ export class UserController {
 
     @Delete(':id')
     async softDelete(
-        @Param('id') id: string) 
-        {
+        @Param('id') id: string) {
         return await this.userService.softDelete(Number(id));
     }
 
